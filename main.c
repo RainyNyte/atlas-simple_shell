@@ -6,8 +6,10 @@ int main()
 	char *drifter; /*temporary storage of the individual tokens before assigning them to the array*/
 	char *toks[100]; /*array of tokens converted from the input provided*/
 	char dir[PATH_MAX];
+	int found;
 	int end; /*used to store the result of strcmp for checking if the exit command is entered*/
 	size_t i; /*iterative variable used for processing strtok*/
+	pid_t pid;
 
 	end = 1;
 
@@ -20,15 +22,34 @@ int main()
 		printf("$: ");
 		fgets(in, sizeof(in), stdin); /*reads the input from the terminal*/
 		in[strcspn(in, "\n")] = 0; /*removes the newline at the end of the input string*/
-		end = strcmp(in,"exit"); /*sets the value of end to the output of comparing the input with the literal "exit" used to check for the exit command in the input*/
 		drifter = strtok(in, " ");
 		i = 0;
+		end = strcmp(in,"exit"); /*sets the value of end to the output of comparing the input with the literal "exit" used to check for the exit command in the input*/
 		while (drifter != NULL) /*loop to handle the assignment of the tokens to the toks array*/
 		{
 			toks[i++] = drifter;
 			drifter = strtok(NULL, " ");
 		}
-		// check_path(toks);
+		found = check_path(toks[0]);
+		printf("%d", found);
+		if (found == 0)
+		{
+			pid = fork();
+			if (pid == 0)
+			{
+				execve(toks[0], toks, environ);
+				exit(EXIT_FAILURE);
+			}
+			else if (pid > 0)
+			{
+				wait(NULL);
+
+			}
+		}
+		else if (end != 0)
+		{
+			printf("%s: not found\n", toks[0]);
+		}
 	}
 	return(0);
 }

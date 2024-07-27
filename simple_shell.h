@@ -8,6 +8,8 @@
 #include <string.h>
 #include <limits.h>
 
-char *check_path(char **toks);
+extern char **environ;
+
+int check_path(char *command);
 
 #endif

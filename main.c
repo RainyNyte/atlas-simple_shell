@@ -6,7 +6,6 @@ int main()
 	char *drifter; /*temporary storage of the individual tokens before assigning them to the array*/
 	char *toks[100]; /*array of tokens converted from the input provided*/
 	char dir[PATH_MAX];
-	int found;
 	int end; /*used to store the result of strcmp for checking if the exit command is entered*/
 	size_t i; /*iterative variable used for processing strtok*/
 	pid_t pid;
@@ -30,25 +29,15 @@ int main()
 			toks[i++] = drifter;
 			drifter = strtok(NULL, " ");
 		}
-		found = check_path(toks[0]);
-		printf("%d", found);
-		if (found == 0)
+		pid = fork();
+		if (pid == 0)
 		{
-			pid = fork();
-			if (pid == 0)
-			{
-				execve(toks[0], toks, environ);
-				exit(EXIT_FAILURE);
-			}
-			else if (pid > 0)
-			{
-				wait(NULL);
-
-			}
+			execve(toks[0], toks, environ);
+			exit(EXIT_FAILURE);
 		}
-		else if (end != 0)
+		else if (pid > 0)
 		{
-			printf("%s: not found\n", toks[0]);
+			wait(NULL);
 		}
 	}
 	return(0);
